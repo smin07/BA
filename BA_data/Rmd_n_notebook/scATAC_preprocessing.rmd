@@ -1,0 +1,132 @@
+---
+title: "scATAC_preprocessing"
+output: html_document
+date: "2026-03-31"
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(Signac)
+library(Seurat)
+library(SeuratDisk)
+```
+
+## read in scATAC-seq data
+```{r seurat object}
+
+
+Convert("/home/fgsasse_lrs_1/Downloads/BA/BA_data/ATAC/zf_multiome_atlas_full_ATAC_v1_release.h5ad", dest = "h5seurat", assay = "X", overwrite = TRUE)
+seu.obj <- LoadH5Seurat("/home/fgsasse_lrs_1/Downloads/BA/BA_data/ATAC/zf_multiome_atlas_full_ATAC_v1_release.h5seurat", assays = "counts")
+
+metadata <- read.csv(
+  file = "/home/fgsasse_lrs_1/Downloads/BA/BA_data/ATAC/zf_multiome_atlas_full_ATAC_v1_release",
+  header = TRUE,
+  row.names = 1
+)
+
+chrom_assay <- CreateChromatinAssay(
+  counts = counts,
+  sep = c(":", "-"),
+  fragments = "10k_pbmc_ATACv2_nextgem_Chromium_Controller_fragments.tsv.gz",
+  min.cells = 10,
+  min.features = 200
+)
+
+"atacobj" <- CreateSeuratObject(
+  counts = chrom_assay,
+  assay = "peaks",
+  meta.data = metadata
+)
+
+```
+
+# adding metadata to seurat object
+```{r seurat object metadata}
+#adding metadata to seurat object
+metadata_old <- seu.obj@meta.data
+metadata_old$cell_id <- rownames(metadata_old)
+
+metadata_new <- read.delim("/home/fgsasse_lrs_1/Downloads/BA/BA_data/RNA/cells.tsv", header = FALSE)
+
+colnames <- c("cell_id",'developmental_stage', 'dataset', 'zebrafish_anatomy_ontology_class',
+       'zebrafish_anatomy_ontology_class_coarse', 'timepoint',
+       'n_genes_by_counts', 'total_counts', 'total_counts_mt', 'pct_counts_mt',
+       'total_counts_nc', 'pct_counts_nc')
+colnames(metadata_new) <- colnames
+head(metadata_new)
+
+metadata <- merge.data.frame(metadata_old, metadata_new, by = "cell_id", sort=FALSE)
+rownames(metadata) <- metadata$cell_id
+
+all(rownames(metadata) == rownames(seu.obj@meta.data)) # check if rownames of metadata match colnames of seurat object
+seu.obj@meta.data <- metadata
+
+```
+
+
+## QC
+Nucleocome signal: mononucleosomal (149-294 bp) / nucleosome-free (<149 bp) fragments
+- successful ATAC-seq experiment exhibits typically a depletion of DNA fragments with lengths that are multiples of 149 bp *NucleosomeSignal*
+
+Transcriptional start site (TSS) enrichment: mean Tn5 insertion count (±500 bp around the TSS)/ mean Tn5 insertions in flanking regions (+900 to +1000 bp and −900 to −1000 bp)
+TSS enrichment indicates how strongly accesisble chromatin is enriched around gene start sites
+- high score indicates clear chromatin accessibility signal; good quality cell *TSSEnrichment*
+
+```{QC}
+##plotting the nucleosome signal
+"atacobj"$nucleosome_group <- ifelse(pbmc$nucleosome_signal > 4, 'NS > 4', 'NS < 4') #standard threshold for NS
+FragmentHistogram(object = "atacobj", group.by = 'nucleosome_group') + 
+  geom_vline(xintercept = 149, linetype="dotted", color = "darkred", size=0.5)
+
+#NS vs fragment counts
+FeatureScatter(
+  object = "atacobj",
+  feature1 = "nucleosome_signal",
+  feature2 = "nCount_ATAC"
+)
+
+#NS vs TSS enrichment
+FeatureScatter(
+  object = "atacobj",
+  feature1 = "nucleosome_signal",
+  feature2 = "TSS.enrichment"
+)
+#after running TSSEnrichment
+
+TSSPlot("atacobj", assay = NULL, group.by = NULL, idents = NULL)
+
+```
+
+##Dimension Reduction
+Latent Semantic Indexing (LSI)
+If we apply Principal Component Analysis on this sparse insertion counts matrix and plot the top two principal components, we wouldn't obtain the desired result because the sparsity causes high inter-cell similarity at all of the 0 positions. To get around this issue, we use a layered dimensionality reduction approach. First, we use Latent Semantic Indexing (LSI), an approach from natural language processing that was originally designed to assess document similarity based on word counts. 
+The resultant term frequency-inverse document frequency (TF-IDF) matrix reflects how important a word (aka region/peak) is to a document (aka sample). Then, through a technique called singular value decomposition (SVD), the most valuable information across samples is identified and represented in a lower dimensional space. *RunSVD*
+Then Uniform Manifold Approximation and Projection (UMAP) is used to visualize the data. *RunUMAP*
+- The first LSI component was excluded from each analysis as it typically captures sequencing depth (technical variation) and was highly correlated with the total number of counts for the cell (?)
+```{Dimention Reduction and Visualization}
+"atacobj" <- RunTFIDF("atacobj")
+"atacobj" <- FindTopFeatures("atacobj", min.cutoff = 'q75') #‘q75’ to use the top 25% all peaks
+"atacobj" <- RunSVD("atacobj")
+
+#The first LSI component often captures sequencing depth (technical variation) rather than biological variation. If this is the case, the component should be removed from downstream analysis. We can assess the correlation between each LSI component and sequencing depth using the "DepthCor()" function:
+
+DepthCor("atacobj)
+
+
+```
+
+##Peak Calling 
+Peak calling was performed for each cell type using the CallPeaks function in Signac, with group.by = c('celltype', 'timepoint') to call peaks on each predicted cell type separately (in each developmental stages) and combine the resulting peak calls across all cell types (and developmental stages). *CallPeaks* 
+```{Peak Calling}
+
+#peak calling je nach cell type oder cell type und timepoint?
+peaks <- CallPeaks(
+  object = pbmc,
+  group.by = "predicted.id",
+  macs2.path = "/Users/stuartt/.local/bin/macs3"
+)
+```
+
+

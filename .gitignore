@@ -1,0 +1,7 @@
+*.h5ad
+*.h5
+*.h5seurat
+*.mtx
+*.gtf
+*.rds
+*.csv.gz
