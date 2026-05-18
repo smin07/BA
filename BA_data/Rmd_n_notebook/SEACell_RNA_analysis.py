@@ -26,7 +26,7 @@ genes_in_peaks = gene_peaks_10kb['gene_id'].unique()
 filtered_rna = filtered_rna[:, filtered_rna.var_names.isin(genes_in_peaks)].copy()
 print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] After filtering, {filtered_rna.n_vars} genes remain for SEACells fitting")
 
-# Subset to 10,000 cells (random sample)
+## Subset to 10,000 cells (random sample)
 #if filtered_rna.n_obs > 10000:
 #    np.random.seed(42)
 #    selected_cells = np.random.choice(filtered_rna.obs_names, 10000, replace=False)
@@ -78,8 +78,19 @@ model.construct_kernel_matrix()
 M = model.kernel_matrix
 print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Kernel matrix shape: {M.shape}")
 
+# Save the kernel matrix to a file for later use
+np.save(os.path.join(output_dir, "kernel_matrix.npy"), M)
+fn = os.path.join(output_dir, "kernel_matrix_cells.txt")
+cells = seacell_rna.obs_names.values
+with open(fn, 'w') as f:
+    for cell in cells:
+        f.write(f"{cell}\n")
+print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Saved kernel matrix for later use.")
+
+# Fit the model
 model.initialize_archetypes()
 model.fit(min_iter=5, max_iter=100)
+print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] SEACells fitting complete.")
 
 # Save model
 #print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Saving model to {output_dir}...")

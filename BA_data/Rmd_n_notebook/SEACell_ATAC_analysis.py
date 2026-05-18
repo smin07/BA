@@ -19,10 +19,10 @@ data_path = "../ATAC/zf_multiome_atlas_full_ATAC_v1_release.h5ad"
 filtered_atac = sc.read(data_path)
 print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Loaded data: {filtered_atac.shape}")
 
-# Subset to 10,000 cells (random sample)
-#if filtered_atac.n_obs > 10000:
+## Subset to 5,000 cells (random sample)
+#if filtered_atac.n_obs > 5000:
 #    np.random.seed(42)
-#    selected_cells = np.random.choice(filtered_atac.obs_names, 10000, replace=False)
+#    selected_cells = np.random.choice(filtered_atac.obs_names, 5000, replace=False)
 #    filtered_atac = filtered_atac[selected_cells, :].copy()
 #    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Subsetted to 10,000 cells: {filtered_atac.shape}")
 
@@ -47,7 +47,7 @@ plt.savefig(os.path.join(output_dir, "umap_atac.png"))
 plt.close()
 
 # SEACells parameters
-n_SEACells = filtered_atac.n_obs // 100
+n_SEACells = filtered_atac.n_obs // 75
 print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] n_SEACells={n_SEACells}")
 build_kernel_on = 'X_lsi'
 n_waypoint_eigs = 10
@@ -65,8 +65,19 @@ model.construct_kernel_matrix()
 M = model.kernel_matrix
 print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Kernel matrix shape: {M.shape}")
 
+# Save the kernel matrix to a file for later use
+np.save(os.path.join(output_dir, "kernel_matrix.npy"), M)
+fn = os.path.join(output_dir, "kernel_matrix_cells.txt")
+cells = seacell_atac.obs_names.values
+with open(fn, 'w') as f:
+    for cell in cells:
+        f.write(f"{cell}\n")
+print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Saved kernel matrix for later use.")
+
+# Fit the model
 model.initialize_archetypes()
 model.fit(min_iter=5, max_iter=100)
+print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] SEACells fitting complete.")
 
 # Save model
 #print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Saving model to {output_dir}...")
