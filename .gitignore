@@ -5,4 +5,7 @@
 *.gtf
 *.rds
 *.csv.gz
+*.csv
 *.log
+*.gtf.gz
+
