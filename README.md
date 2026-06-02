@@ -4,8 +4,10 @@ Multicellular organisms generate diverse cell types from a shared genome through
 ## Pearson r
 
 Correlation-based peak-gene pairs across cell types
-<img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/434139fb-0788-45db-8ec0-fbf59427678a" />
-<img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/9f2c96bd-f0aa-486d-9a79-474aef8d2c34" />
+<p align="center">
+  <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/434139fb-0788-45db-8ec0-fbf59427678a" />
+  <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/9f2c96bd-f0aa-486d-9a79-474aef8d2c34" />
+</p>
 
 Correlation-based peak-gene pairs across cell types + developmental stages
 <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/84e93eab-e2cd-499d-8db2-9788a3f4e810" />
