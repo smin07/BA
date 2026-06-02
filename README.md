@@ -39,6 +39,14 @@ Multicellular organisms generate diverse cell types from a shared genome through
 
 In both pseudobulk types, the number of non‑significant peaks per gene increases steadily with larger window sizes, reflecting the growing number of candidate regions captured at broader genomic ranges (Figure A,C). In cell‑type pseudobulks, most genes carry only a few significantly correlated peaks across all four TSS‑centered windows, with positively correlated peaks remaining consistently rare (Figure B). Negatively correlated peaks are present at all window sizes but become increasingly prominent at ±100 kb, suggesting that putative repressive regulatory elements are predominantly distal. In the cell type × developmental stage pseudobulks, the overall distribution shape is preserved, but genes exhibit higher peak counts across all window sizes compared to cell‑type‑only aggregation (Figure D). This increase is consistent with the capture of context‑specific accessible regions that are averaged out when collapsing across developmental stages. Notably, negatively correlated peaks become more prominent from ±50 kb onward, indicating that stage‑aware aggregation increases sensitivity to distal regulatory associations, including putative repressive elements that remain undetected in the coarser cell‑type pseudobulks.
 
-
+## Ordinary Least Squares (OLS)
+<h5>OLS-based peak-gene pairs across cell types</h5>
+ <table>
+  <tr>
+    <td align="center">
+      <b>A</b><br>
+        <img width="1383" height="589" alt="image" src="https://github.com/user-attachments/assets/a278e810-6c8e-4994-8040-3fafe4c45085" />
+    </td>
+</table>
 
 
