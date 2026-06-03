@@ -52,12 +52,16 @@ def classify_peak_gene_pair(row: Mapping[str, Any], padj_threshold: float = 0.05
 
 
 def compute_window_peak_correlations(
-    pb_atac_ct_time: Any,
-    pb_rna_ct_time: Any,
+    atac_data: Any,
+    rna_data: Any,
     gene_peaks_df: Any,
     selected_peaks: Sequence[str] | None = None,
 ) -> dict[str, dict[str, dict[str, float]]]:
-    """Compute peak-wise Pearson correlations for one window assignment table."""
+    """Compute peak-wise Pearson correlations for one window assignment table.
+
+    Parameters `atac_data` and `rna_data` are generic: they can be any objects
+    exposing a `.X` matrix and `.var_names` attribute (e.g., AnnData).
+    """
 
     np = _import_numpy()
     from scipy.stats import pearsonr
@@ -74,7 +78,7 @@ def compute_window_peak_correlations(
         assigned_peaks = [
             peak_id
             for peak_id in _parse_assigned_peaks(assigned_peaks_raw)
-            if peak_id in pb_atac_ct_time.var_names
+            if peak_id in atac_data.var_names
         ]
 
         # if caller provided a subset of peaks to consider, restrict to their intersection
@@ -86,10 +90,10 @@ def compute_window_peak_correlations(
             gene_peak_results[gene_id] = peak_corrs
             continue
 
-        gene_expression = np.asarray(pb_rna_ct_time[:, gene_id].X).ravel()
+        gene_expression = np.asarray(rna_data[:, gene_id].X).ravel()
 
         for peak_id in assigned_peaks:
-            peak_accessibility = np.asarray(pb_atac_ct_time[:, peak_id].X).ravel()
+            peak_accessibility = np.asarray(atac_data[:, peak_id].X).ravel()
 
             if np.std(gene_expression) == 0 or np.std(peak_accessibility) == 0:
                 peak_corrs[peak_id] = {"correlation": np.nan, "pval": np.nan, "padj": np.nan}
@@ -135,20 +139,23 @@ def adjust_window_peak_correlations(
 
 
 def compute_all_window_peak_correlations(
-    pb_atac_ct_time: Any,
-    pb_rna_ct_time: Any,
+    atac_data: Any,
+    rna_data: Any,
     window_assignments: Mapping[str, Any],
     method: str = "fdr_bh",
     selected_peaks: Sequence[str] | None = None,
 ) -> dict[str, dict[str, dict[str, dict[str, float]]]]:
-    """Compute correlations for every window assignment table."""
+    """Compute correlations for every window assignment table.
+
+    Accepts generic `atac_data` and `rna_data` objects (not CT/time-specific).
+    """
 
     all_results: dict[str, dict[str, dict[str, dict[str, float]]]] = {}
 
     for window_label, gene_peaks_df in window_assignments.items():
         window_results = compute_window_peak_correlations(
-            pb_atac_ct_time=pb_atac_ct_time,
-            pb_rna_ct_time=pb_rna_ct_time,
+            atac_data=atac_data,
+            rna_data=rna_data,
             gene_peaks_df=gene_peaks_df,
             selected_peaks=selected_peaks,
         )
@@ -505,8 +512,11 @@ def plot_peak_count_distribution(
     return fig, ax
 
 
-def load_ct_time_correlation_inputs(base_dir: str | Path) -> dict[str, Any]:
-    """Load the notebook inputs from the repository layout used in this project."""
+def load_correlation_inputs(base_dir: str | Path) -> dict[str, Any]:
+    """Load default inputs from the repository layout.
+
+    Returns a dict with keys `atac_data` and `rna_data` (and the gene_peak tables).
+    """
 
     pd = _import_pandas()
     import anndata
@@ -516,10 +526,10 @@ def load_ct_time_correlation_inputs(base_dir: str | Path) -> dict[str, Any]:
     pseudobulk_dir = base_path / "BA_data" / "Pseudobulks"
 
     return {
-        "pb_atac_ct_time": anndata.read_h5ad(
+        "atac_data": anndata.read_h5ad(
             pseudobulk_dir / "ATAC" / "celltypes_times" / "agg_atac_ct_time.h5ad"
         ),
-        "pb_rna_ct_time": anndata.read_h5ad(
+        "rna_data": anndata.read_h5ad(
             pseudobulk_dir / "RNA" / "celltypes_times" / "agg_rna_ct_time.h5ad"
         ),
         "gene_peaks_10kb": pd.read_csv(results_dir / "gene_peak_assignments_10kb.csv"),
