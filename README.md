@@ -8,14 +8,16 @@ Multicellular organisms generate diverse cell types from a shared genome through
   <tr>
     <td align="center">
       <b>A</b><br>
-      <img width="400" height="250" src="https://github.com/user-attachments/assets/434139fb-0788-45db-8ec0-fbf59427678a" />
+      <img width="400" height="250" alt="first_pair_count_cor_ct" src="https://github.com/user-attachments/assets/7b60fc66-3dce-49fb-bcec-ad98f95ee661" />
+" />
     </td>
     <td align="center">
       <b>B</b><br>
-      <img width="400" height="250" src="https://github.com/user-attachments/assets/9f2c96bd-f0aa-486d-9a79-474aef8d2c34" />
+      <img width="400" height="250" alt="first_pair_count_cor_ct2" src="https://github.com/user-attachments/assets/5a1aab16-7a98-4f94-8b2e-535a84b9751c" />
     </td>
   </tr>
-</table>
+</table><img width="2700" height="1800" alt="first_pair_count_cor_ct_time" src="https://github.com/user-attachments/assets/8f4ddf9e-acda-4c53-8315-a42ddd093e23" />
+
 
 **A.** Distribution of identified peak-gene pairs across cell types in different TSS-centered windows.  
 **B.** Distribution of signigicant peak-gene pairs across cell types in different TSS-centered windows.
@@ -25,11 +27,11 @@ Multicellular organisms generate diverse cell types from a shared genome through
   <tr>
     <td align="center">
       <b>C</b><br>
-      <img width="400" height="250" src="https://github.com/user-attachments/assets/84e93eab-e2cd-499d-8db2-9788a3f4e810" />
+      <img width="400" height="250" alt="first_pair_count_cor_ct_time" src="https://github.com/user-attachments/assets/b2168e44-ef04-45a1-82db-70de74218add" />
     </td>
     <td align="center">
       <b>D</b><br>
-      <img width="400" height="250" src="https://github.com/user-attachments/assets/ed0d73a3-34e9-42c5-a2ff-e498cea7e9a6" />
+      <img width="400" height="250" alt="first_pair_count_cor_ct_time2" src="https://github.com/user-attachments/assets/91c3958b-197c-47ea-9263-da079207cc2b" />
     </td>
   </tr>
 </table>
