@@ -16,8 +16,6 @@ Multicellular organisms generate diverse cell types from a shared genome through
       <img width="400" height="250" alt="first_pair_count_cor_ct2" src="https://github.com/user-attachments/assets/5a1aab16-7a98-4f94-8b2e-535a84b9751c" />
     </td>
   </tr>
-</table><img width="2700" height="1800" alt="first_pair_count_cor_ct_time" src="https://github.com/user-attachments/assets/8f4ddf9e-acda-4c53-8315-a42ddd093e23" />
-
 
 **A.** Distribution of identified peak-gene pairs across cell types in different TSS-centered windows.  
 **B.** Distribution of signigicant peak-gene pairs across cell types in different TSS-centered windows.
