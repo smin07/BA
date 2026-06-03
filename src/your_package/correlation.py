@@ -1,4 +1,4 @@
-"""Helpers extracted from the RNA_ATAC_correlation_ct_time notebook.
+"""Helpers extracted from the RNA_ATAC_correlation_ct notebook.
 
 This module provides generalized correlation helpers usable with any
 objects exposing a minimal `.X` matrix interface (e.g., AnnData pseudobulks).
