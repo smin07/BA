@@ -49,4 +49,14 @@ In both pseudobulk types, the number of non‑significant peaks per gene increas
     </td>
 </table>
 
+## Repository layout
+
+The analysis code is being organized around a standard `src/` layout:
+
+- `src/your_package/` for reusable data-processing, plotting, and modeling helpers
+- `notebooks/` for exploratory and final analysis notebooks
+- `scripts/` for runnable pipeline entry points
+- `tests/` for unit tests
+- `data/` for local data staging and generated artifacts
+
 
