@@ -1,5 +1,4 @@
-"""Helpers extracted from the RNA_ATAC_correlation_ct notebook.
-
+"""
 This module provides generalized correlation helpers usable with any
 objects exposing a minimal `.X` matrix interface (e.g., AnnData pseudobulks).
 """
@@ -25,6 +24,107 @@ def _import_pandas():
     import pandas as pd
 
     return pd
+
+"""
+data_scaling.py
+---------------
+Utility functions for preprocessing pseudobulk single-cell multiome data
+(RNA-seq and ATAC-seq) prior to peak-gene correlation analysis.
+
+Usage
+-----
+from data_scaling import data_scaling
+
+pb_rna_ct, pb_atac_ct = data_scaling(pb_rna_ct, pb_atac_ct)
+"""
+
+import numpy as np
+
+
+def data_scaling(rna_data, atac_data, scale_factor: float = 1e7) -> tuple:
+    """
+    Apply log10-normalisation to pseudobulk RNA-seq and ATAC-seq count matrices.
+
+    For each modality, a small epsilon value is added to all entries before
+    log-transformation to handle zero counts without producing -inf values.
+    Epsilon is defined as the minimum non-zero value observed in the respective
+    matrix, ensuring the shift is as small as possible while remaining
+    numerically stable.
+
+    The transformation applied to each matrix X is:
+
+        X_scaled = log10( (X + epsilon) * scale_factor )
+
+    This places both modalities on a comparable log scale and amplifies
+    differences in low-count regions, which is appropriate for sparse
+    pseudobulk data.
+
+    Parameters
+    ----------
+    rna_data : AnnData
+        Pseudobulk RNA-seq AnnData object with observations (rows) as cell
+        types and variables (columns) as genes. The .X matrix is modified
+        in place.
+    atac_data : AnnData
+        Pseudobulk ATAC-seq AnnData object with observations (rows) as cell
+        types and variables (columns) as peaks. The .X matrix is modified
+        in place.
+    scale_factor : float, optional
+        Multiplicative scaling factor applied before log-transformation.
+        Default is 1e7 (10,000,000).
+
+    Returns
+    -------
+    rna_data : AnnData
+        RNA-seq AnnData object with log10-scaled .X matrix.
+    atac_data : AnnData
+        ATAC-seq AnnData object with log10-scaled .X matrix.
+
+    Raises
+    ------
+    ValueError
+        If either matrix contains no non-zero entries, epsilon cannot be
+        determined and scaling is aborted.
+
+    Examples
+    --------
+    >>> pb_rna_ct, pb_atac_ct = data_scaling(pb_rna_ct, pb_atac_ct)
+    >>> pb_rna_ct, pb_atac_ct = data_scaling(pb_rna_ct, pb_atac_ct, scale_factor=1e6)
+    """
+
+    # ── RNA-seq ───────────────────────────────────────────────────────────────
+    non_zero_mask_rna = rna_data.X > 0
+
+    if not np.any(non_zero_mask_rna):
+        raise ValueError(
+            "RNA-seq matrix contains no non-zero entries. "
+            "Cannot determine epsilon for log-transformation."
+        )
+
+    epsilon_rna = np.min(rna_data.X[non_zero_mask_rna])
+    rna_data.X  = np.log10((rna_data.X + epsilon_rna) * scale_factor)
+
+    # ── ATAC-seq ──────────────────────────────────────────────────────────────
+    non_zero_mask_atac = atac_data.X > 0
+
+    if not np.any(non_zero_mask_atac):
+        raise ValueError(
+            "ATAC-seq matrix contains no non-zero entries. "
+            "Cannot determine epsilon for log-transformation."
+        )
+
+    epsilon_atac = np.min(atac_data.X[non_zero_mask_atac])
+    atac_data.X  = np.log10((atac_data.X + epsilon_atac) * scale_factor)
+
+    print(
+        f"[data_scaling] RNA-seq epsilon:  {epsilon_rna:.6e}\n"
+        f"[data_scaling] ATAC-seq epsilon: {epsilon_atac:.6e}\n"
+        f"[data_scaling] Scale factor:     {scale_factor:.2e}\n"
+        f"[data_scaling] Transformation:   log10( (X + epsilon) * scale_factor )\n"
+        f"[data_scaling] Done. Both matrices scaled in place."
+    )
+
+    return rna_data, atac_data
 
 
 def _parse_assigned_peaks(assigned_peaks_raw: Any) -> list[str]:
@@ -510,30 +610,3 @@ def plot_peak_count_distribution(
         fig.savefig(output_path, dpi=300, bbox_inches="tight")
 
     return fig, ax
-
-
-def load_correlation_inputs(base_dir: str | Path) -> dict[str, Any]:
-    """Load default inputs from the repository layout.
-
-    Returns a dict with keys `atac_data` and `rna_data` (and the gene_peak tables).
-    """
-
-    pd = _import_pandas()
-    import anndata
-
-    base_path = Path(base_dir)
-    results_dir = base_path / "BA_data" / "Rmd_n_notebook"
-    pseudobulk_dir = base_path / "BA_data" / "Pseudobulks"
-
-    return {
-        "atac_data": anndata.read_h5ad(
-            pseudobulk_dir / "ATAC" / "celltypes_times" / "agg_atac_ct_time.h5ad"
-        ),
-        "rna_data": anndata.read_h5ad(
-            pseudobulk_dir / "RNA" / "celltypes_times" / "agg_rna_ct_time.h5ad"
-        ),
-        "gene_peaks_10kb": pd.read_csv(results_dir / "gene_peak_assignments_10kb.csv"),
-        "gene_peaks_20kb": pd.read_csv(results_dir / "gene_peak_assignments_20kb.csv"),
-        "gene_peaks_50kb": pd.read_csv(results_dir / "gene_peak_assignments_50kb.csv"),
-        "gene_peaks_100kb": pd.read_csv(results_dir / "gene_peak_assignments_100kb.csv"),
-    }
