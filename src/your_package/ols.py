@@ -175,3 +175,78 @@ def compute_peak_gene_ols(
     )
 
     return ols_results, ols_df
+
+import numpy as np
+import pandas as pd
+
+
+def classify_peak_gene_pairs(
+    df: pd.DataFrame,
+    pval_col: str = "pval",
+    coef_col: str = "coef",
+    alpha: float = 0.05,
+) -> pd.DataFrame:
+    """
+    Classify peak–gene associations into positive, negative, or non-significant.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame containing at least coefficient and p-value columns.
+
+    pval_col : str
+        Column name for p-values.
+
+    coef_col : str
+        Column name for regression coefficients.
+
+    alpha : float
+        Significance threshold.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with an added 'category' column.
+    """
+
+    def _classify(row):
+        if row[pval_col] >= alpha and row[coef_col] < 0:
+            return "sig. negative"
+        elif row[pval_col] >= alpha and row[coef_col] > 0:
+            return "sig. positive"
+        else:
+            return "non-significant"
+
+    df = df.copy()
+    df["category"] = df.apply(_classify, axis=1)
+
+    return df
+
+def aggregate_peak_gene_categories(
+    df: pd.DataFrame,
+    group_cols: list[str] = ["window", "gene", "category"],
+) -> pd.DataFrame:
+    """
+    Aggregate classified peak–gene pairs by counting occurrences per group.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame containing a 'category' column.
+
+    group_cols : list[str]
+        Columns to group by.
+
+    Returns
+    -------
+    pd.DataFrame
+        Aggregated counts per group.
+    """
+
+    return (
+        df
+        .dropna(subset=group_cols)
+        .groupby(group_cols)
+        .size()
+        .reset_index(name="count")
+    )
