@@ -79,7 +79,7 @@ def compute_peak_gene_ols(
 
         assigned_peaks = [
             p for p in assigned_peaks
-            if p in pb_atac_ct.var_names
+            if p in atac_data.var_names
         ]
 
         if len(assigned_peaks) == 0:
@@ -87,7 +87,7 @@ def compute_peak_gene_ols(
             continue
 
         y = (
-            np.asarray(pb_rna_ct[:, gene_id].X)
+            np.asarray(rna_data[:, gene_id].X)
             .ravel()
             .astype(float)
         )
@@ -97,7 +97,7 @@ def compute_peak_gene_ols(
             continue
 
         X_raw = (
-            np.asarray(pb_atac_ct[:, assigned_peaks].X)
+            np.asarray(atac_data[:, assigned_peaks].X)
             .astype(float)
         )
 
