@@ -1,0 +1,25 @@
+name: seacells
+channels:
+  - conda-forge
+dependencies:
+  - scanpy=1.12.1
+  - ipython
+  - python-igraph
+  - python=3.12.13
+  - loompy=3.0.6
+  - seaborn
+  - cython
+  - pip
+  - louvain[version='>=0.6,!=0.6.2']
+  - leidenalg
+  - ipykernel
+  - pytables
+  - numpy
+  - matplotlib
+  - anndata
+  - ipywidgets
+  - jupyterlab_widgets
+  - r-base
+  - r-data.table
+  - r-devtools
+  - zlib
