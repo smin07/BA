@@ -46,10 +46,21 @@ In both pseudobulk types, the number of non‑significant peaks per gene increas
   <tr>
     <td align="center">
       <b>A</b><br>
-        <img width="1383" height="589" alt="image" src="https://github.com/user-attachments/assets/a278e810-6c8e-4994-8040-3fafe4c45085" />
+        <img width="1389" height="593" alt="image" src="https://github.com/user-attachments/assets/fadb8acc-5a7f-4feb-bbec-9432e13a48e3" />
     </td>
 </table>
 
+
+<h5>OLS-based peak-gene pairs across cell types and developmental stages</h5>
+ <table>
+  <tr>
+    <td align="center">
+      <b>B</b><br>
+        <img width="1389" height="593" alt="image" src="https://github.com/user-attachments/assets/8d204efc-e4e8-4dc7-8bfd-53d44cf8ca21" />
+    </td>
+</table>
+
+In overall, "OLS" seems to detect more significant negatively associated peaks then "Correlation"
 ## Repository layout
 
 The analysis code is being organized around a standard `src/` layout:
