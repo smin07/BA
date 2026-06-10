@@ -210,9 +210,9 @@ def classify_peak_gene_pairs(
     """
 
     def _classify(row):
-        if row[pval_col] >= alpha and row[coef_col] < 0:
+        if row[pval_col] <= alpha and row[coef_col] < 0:
             return "sig. negative"
-        elif row[pval_col] >= alpha and row[coef_col] > 0:
+        elif row[pval_col] <= alpha and row[coef_col] > 0:
             return "sig. positive"
         else:
             return "non-significant"
