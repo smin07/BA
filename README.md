@@ -18,7 +18,7 @@ Multicellular organisms generate diverse cell types from a shared genome through
 </table>
 
 **A.** Distribution of identified peak-gene pairs across cell types in different TSS-centered windows.  
-**B.** Distribution of signigicant peak-gene pairs across cell types in different TSS-centered windows.
+**B.** Distribution of significant peak-gene pairs across cell types in different TSS-centered windows.
 
 <h5>Correlation-based peak-gene pairs across cell types + developmental stages</h5>
 
@@ -36,46 +36,82 @@ Multicellular organisms generate diverse cell types from a shared genome through
 </table>
 
 **C.** Distribution of identified peak-gene pairs across cell types and developmental stages in different TSS-centered windows.  
-**D.** Distribution of signigicant peak-gene pairs across cell types and developmental stages in different TSS-centered windows.
+**D.** Distribution of significant peak-gene pairs across cell types and developmental stages in different TSS-centered windows.
+
+<h5>Correlation-based peak-gene pairs across SEACells </h5>
+
+<table>
+  <tr>
+    <td align="center">
+      <b>E</b><br>
+      <img width="400" height="250" alt="first_pair_count_cor_ct_time" src="https://github.com/user-attachments/assets/b2168e44-ef04-45a1-82db-70de74218add" />
+    </td>
+    <td align="center">
+      <b>F</b><br>
+      <img width="400" height="250" alt="first_pair_count_cor_ct_time2" src="https://github.com/user-attachments/assets/91c3958b-197c-47ea-9263-da079207cc2b" />
+    </td>
+  </tr>
+</table>
+
+**E.** Distribution of identified peak-gene pairs across cell types and developmental stages in different TSS-centered windows.  
+**F.** Distribution of significant peak-gene pairs across cell types and developmental stages in different TSS-centered windows.
 
 In both pseudobulk types, the number of non‑significant peaks per gene increases steadily with larger window sizes, reflecting the growing number of candidate regions captured at broader genomic ranges (Figure A,C). In cell‑type pseudobulks, most genes carry only a few significantly correlated peaks across all four TSS‑centered windows, with positively correlated peaks remaining consistently rare (Figure B). Negatively correlated peaks are present at all window sizes but become increasingly prominent at ±100 kb, suggesting that putative repressive regulatory elements are predominantly distal. In the cell type × developmental stage pseudobulks, the overall distribution shape is preserved, but genes exhibit higher peak counts across all window sizes compared to cell‑type‑only aggregation (Figure D). This increase is consistent with the capture of context‑specific accessible regions that are averaged out when collapsing across developmental stages. Notably, negatively correlated peaks become more prominent from ±50 kb onward, indicating that stage‑aware aggregation increases sensitivity to distal regulatory associations, including putative repressive elements that remain undetected in the coarser cell‑type pseudobulks.
 
 ## Ordinary Least Squares (OLS)
-<h5>Correlation-based peak-gene pairs across cell types</h5>
+<h5>OLS-based peak-gene pairs across cell types</h5>
 
 <table>
   <tr>
     <td align="center">
       <b>A</b><br>
-      <img width="400" height="250"  alt="image" src="https://github.com/user-attachments/assets/6ff62393-4aae-4283-b1cc-f2efb1fe1a27" />
+      <img width="400" height="250"  alt="image" src="https://github.com/user-attachments/assets/07c00c5b-af23-48bd-bb12-38a7109b85c1" />
     </td>
     <td align="center">
       <b>B</b><br>
-      <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/01074ca1-bd37-4d14-8a20-f736ceab46b9" />
+      <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/bad9a926-41b0-408d-890e-4784c425a03e" />
     </td>
   </tr>
 </table>
 
 **A.** Distribution of identified peak-gene pairs across cell types in different TSS-centered windows.  
-**B.** Distribution of signigicant peak-gene pairs across cell types in different TSS-centered windows.
+**B.** Distribution of significant peak-gene pairs across cell types in different TSS-centered windows.
 
-<h5>Correlation-based peak-gene pairs across cell types + developmental stages</h5>
+<h5>OLS-based peak-gene pairs across cell types + developmental stages</h5>
 
 <table>
   <tr>
     <td align="center">
       <b>C</b><br>
-      <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/6e3508d6-a4f3-4867-846d-2f0b796747cb" />
+      <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/9e60af42-feaf-4f35-895e-0d523e1d50ce" />
     </td>
     <td align="center">
       <b>D</b><br>
-      <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/1808be28-a1de-4c64-9cb6-c82972bb5dcd" />
+      <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/9f1f369f-ca9c-4a8a-a3c7-829eb03e44b9" />
     </td>
   </tr>
 </table>
 
 **C.** Distribution of identified peak-gene pairs across cell types and developmental stages in different TSS-centered windows.  
-**D.** Distribution of signigicant peak-gene pairs across cell types and developmental stages in different TSS-centered windows.
+**D.** Distribution of significant peak-gene pairs across cell types and developmental stages in different TSS-centered windows.
+
+<h5>OLS-based peak-gene pairs across SEACells </h5>
+
+<table>
+  <tr>
+    <td align="center">
+      <b>E</b><br>
+      <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/4ca081f8-3edd-4756-84a4-3c7cb4cece8e" />
+    </td>
+    <td align="center">
+      <b>F</b><br>
+      <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/67c5b08c-d3e2-4b79-bf22-8f87a7a4a792" />
+    </td>
+  </tr>
+</table>
+
+**E.** Distribution of identified peak-gene pairs across SEACells in different TSS-centered windows.  
+**F.** Distribution of significant peak-gene pairs across SEACells in different TSS-centered windows.
 
 ## OLS vs Pearson r
 <h5>OLS-based peak-gene pairs across cell types</h5>
