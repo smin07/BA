@@ -40,9 +40,21 @@ Multicellular organisms generate diverse cell types from a shared genome through
 
 <h5>Correlation-based peak-gene pairs across SEACells </h5>
 
+<table>
+  <tr>
+    <td align="center">
+      <b>E</b><br>
+      <img width="400" height="250" alt="first_pair_count_cor_ct_time" src="https://github.com/user-attachments/assets/f7e835ee-9508-4737-b097-39695c913082" />
+    </td>
+    <td align="center">
+      <b>F</b><br>
+      <img width="400" height="250" alt="first_pair_count_cor_ct_time2" src="https://github.com/user-attachments/assets/4051ac85-ff8b-4051-91d9-693889df7bc0" />
+    </td>
+  </tr>
+</table>
 
-**E.** ...
-**F.** ...
+**E.** Distribution of identified peak-gene pairs across cell types and developmental stages in different TSS-centered windows.  
+**F.** Distribution of significant peak-gene pairs across cell types and developmental stages in different TSS-centered windows.
 
 In both pseudobulk types, the number of non‑significant peaks per gene increases steadily with larger window sizes, reflecting the growing number of candidate regions captured at broader genomic ranges (Figure A,C). In cell‑type pseudobulks, most genes carry only a few significantly correlated peaks across all four TSS‑centered windows, with positively correlated peaks remaining consistently rare (Figure B). Negatively correlated peaks are present at all window sizes but become increasingly prominent at ±100 kb, suggesting that putative repressive regulatory elements are predominantly distal. In the cell type × developmental stage pseudobulks, the overall distribution shape is preserved, but genes exhibit higher peak counts across all window sizes compared to cell‑type‑only aggregation (Figure D). This increase is consistent with the capture of context‑specific accessible regions that are averaged out when collapsing across developmental stages. Notably, negatively correlated peaks become more prominent from ±50 kb onward, indicating that stage‑aware aggregation increases sensitivity to distal regulatory associations, including putative repressive elements that remain undetected in the coarser cell‑type pseudobulks.
 
