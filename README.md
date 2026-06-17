@@ -119,21 +119,28 @@ In both pseudobulk types, the number of non‑significant peaks per gene increas
   <tr>
     <td align="center">
       <b>A</b><br>
-        <img width="1389" height="593" alt="image" src="https://github.com/user-attachments/assets/fadb8acc-5a7f-4feb-bbec-9432e13a48e3" />
+        <img width="1389" height="593" alt="image" src="" />
     </td>
 </table>
-
 
 <h5>OLS-based peak-gene pairs across cell types and developmental stages</h5>
  <table>
   <tr>
     <td align="center">
-      <b>B</b><br>
-        <img width="1389" height="593" alt="image" src="https://github.com/user-attachments/assets/8d204efc-e4e8-4dc7-8bfd-53d44cf8ca21" />
+      <b>C</b><br>
+        <img width="1389" height="593" alt="image" src="https://github.com/user-attachments/assets/671d4b7f-0817-48f3-8516-2d2ccec9ada1"" />
+    </td>
+  <table>
+
+  <table>
+    <tr>
+    <td align="center">
+      <b>D</b><br>
+      <img width="1000" height="593" alt="image" src="https://github.com/user-attachments/assets/d5c1e68a-6b75-41b6-8690-3ed9b1a9465a" />
     </td>
 </table>
 
-In overall, "OLS" seems to detect more significant negatively associated peaks then "Correlation"
+In overall, "OLS" seems to detect more genes with fewer significant peaks associated than "Correlation" and "Correlation" selects more significant peaks for genes in general.
 ## Repository layout
 
 The analysis code is being organized around a standard `src/` layout:
