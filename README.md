@@ -128,7 +128,7 @@ In both pseudobulk types, the number of non‑significant peaks per gene increas
   <tr>
     <td align="center">
       <b>C</b><br>
-        <img width="1389" height="593" alt="image" src="https://github.com/user-attachments/assets/671d4b7f-0817-48f3-8516-2d2ccec9ada1"" />
+        <img width="1389" height="593" alt="image" src="https://github.com/user-attachments/assets/caa966ef-5c4b-46ba-a48f-19d232169cda" />
     </td>
   <table>
 
