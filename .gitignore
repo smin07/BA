@@ -27,3 +27,4 @@ dist/
 # Jupyter
 .ipynb_checkpoints/
 
+data/*.fa.gz

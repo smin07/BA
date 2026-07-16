@@ -6,7 +6,6 @@ output: github_document
 ## loading libraries
 ```{r libraries}
 library(Seurat)
-library(tidyverse)
 library(ggplot2)
 library(dplyr)
 library(RColorBrewer)
@@ -485,4 +484,266 @@ max(mean_aggall_rna)
 writeLines(cell_id_fil, "cell_id.txt")
 ```
 
+```{r}
+library(dplyr)
+library(ggplot2)
+library(patchwork)
+library(viridis)
+
+# --- stage order: 0 to 30 somites in steps of 5 ---
+stage_levels <- c("0somites", "5somites", "10somites", "15somites",
+                   "20somites", "30somites")
+# adjust exact label strings above to match your actual metadata values, e.g.
+# "0-somite stage" or "5s" etc. — must match cells_time1/cells_time2 exactly
+
+# --- summarise counts ---
+cells_time1 <- so_df %>%   # replace with your pre-filter df name
+  group_by(zebrafish_anatomy_ontology_class, developmental_stage) %>%
+  summarise(n_cells = n(), .groups = "drop")
+
+cells_time2 <- filtered_df %>%
+  group_by(zebrafish_anatomy_ontology_class, developmental_stage) %>%
+  summarise(n_cells = n(), .groups = "drop")
+
+cells_time1$developmental_stage <- factor(cells_time1$developmental_stage, levels = stage_levels)
+cells_time2$developmental_stage <- factor(cells_time2$developmental_stage, levels = stage_levels)
+
+# --- shared cell-type order, based on total counts BEFORE filtering ---
+# ensures both plots use the same x-axis order for direct comparison
+celltype_order <- cells_time1 %>%
+  group_by(zebrafish_anatomy_ontology_class) %>%
+  summarise(total = sum(n_cells)) %>%
+  arrange(desc(total)) %>%
+  pull(zebrafish_anatomy_ontology_class)
+
+cells_time1$zebrafish_anatomy_ontology_class <- factor(
+  cells_time1$zebrafish_anatomy_ontology_class, levels = celltype_order)
+cells_time2$zebrafish_anatomy_ontology_class <- factor(
+  cells_time2$zebrafish_anatomy_ontology_class, levels = celltype_order)
+
+# --- shared theme ---
+thesis_theme <- theme_bw(base_size = 8) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 7),
+    axis.text.y = element_text(size = 7),
+    strip.text  = element_text(size = 7, face = "bold"),
+    legend.position = "none",
+    plot.title = element_text(size = 9, face = "bold"),
+    panel.grid.minor = element_blank()
+  )
+
+# --- shared scales, so both plots are visually identical in style ---
+shared_fill  <- scale_fill_viridis_d()
+shared_y_exp <- scale_y_continuous(expand = expansion(mult = c(0, 0.12)))
+
+# --- plot 1: before filtering ---
+ct_t_n <- ggplot(cells_time1,
+                  aes(x = zebrafish_anatomy_ontology_class,
+                      y = n_cells,
+                      fill = developmental_stage)) +
+  geom_col(alpha = 0.85, width = 0.75) +
+  geom_text(aes(label = ifelse(n_cells < 100, n_cells, "")),
+            vjust = -0.4, size = 2, col = "black", fontface = "bold") +
+  facet_wrap(~ developmental_stage, ncol = 1, scales = "free_y") +
+  shared_fill + shared_y_exp + thesis_theme +
+  labs(title = "Cells per anatomy class (before filtering)",
+       x = "Cell type (zebrafish anatomy ontology class)",
+       y = "Number of cells")
+
+# --- plot 2: after filtering ---
+ct_t_fil_n <- ggplot(cells_time2,
+                      aes(x = zebrafish_anatomy_ontology_class,
+                          y = n_cells,
+                          fill = developmental_stage)) +
+  geom_col(alpha = 0.85, width = 0.75) +
+  geom_text(aes(label = ifelse(n_cells < 100, n_cells, "")),
+            vjust = -0.4, size = 2, col = "black", fontface = "bold") +
+  facet_wrap(~ developmental_stage, ncol = 1, scales = "free_y") +
+  shared_fill + shared_y_exp + thesis_theme +
+  labs(title = "Cells per anatomy class (after filtering)",
+       x = "Cell type (zebrafish anatomy ontology class)",
+       y = "Number of cells")
+
+ct_t_n | ct_t_fil_n
+```
+```{r}
+library(dplyr)
+library(ggplot2)
+library(viridis)
+
+# --- create a fill variable that overrides one specific cell type ---
+cells_time1 <- cells_time1 %>%
+  mutate(fill_group = ifelse(zebrafish_anatomy_ontology_class == "primordial_germ_cells",
+                              "primordial_germ_cells",
+                              as.character(developmental_stage)))
+
+# --- build a manual color scale: viridis colors for stages + red for the highlight ---
+stage_levels <- levels(cells_time1$developmental_stage)
+stage_colors <- viridis(length(cells_time1$zebrafish_anatomy_ontology_class))
+names(stage_colors) <- stage_levels
+
+fill_values <- c(stage_colors, "primordial_germ_cells" = "red")
+
+ct_t_n <- ggplot(cells_time1,
+                  aes(x = zebrafish_anatomy_ontology_class,
+                      y = n_cells,
+                      fill = fill_group)) +
+  geom_col(alpha = 0.85, width = 0.75) +
+  geom_text(aes(label = ifelse(n_cells < 100, n_cells, "")),
+            vjust = -0.4, size = 2, col = "black", fontface = "bold") +
+  facet_wrap(~ developmental_stage, ncol = 2) +
+  scale_fill_manual(values = fill_values, guide = "none") +   # hide legend, redundant with facets + obvious highlight
+  scale_y_continuous(expand = expansion(mult = c(0, 0.12))) +
+  thesis_theme +
+  labs(title = "Number of cells per cell type before filtering",
+       x = "cell types",
+       y = "number of cells")
+
+ct_t_n
+
+ggsave(
+  filename = "ct_t_n_celltypes_before_filtering.pdf",
+  plot = ct_t_n,
+  width = 16,      # cm
+  height = 28,     # cm — tall, to give each of the 7 stacked facets enough room
+  units = "cm",
+  dpi = 300,
+  device = "pdf"    # vector format — best for thesis print, scales without pixelation
+)
+
+# also save a PNG version for quick previews / slides / drafts
+ggsave(
+  filename = "ct_t_n_celltypes_before_filtering.png",
+  plot = ct_t_n,
+  width = 16,
+  height = 28,
+  units = "cm",
+  dpi = 300,
+  device = "png"
+)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(MetBrewer)   # install.packages("Polychrome") if needed
+
+
+cells_time1b <- so_df %>%   # replace with your pre-filter df name
+  group_by(zebrafish_anatomy_ontology_class, timepoint) %>%
+  summarise(n_cells = n(), .groups = "drop")
+
+tp_levels <- c("10hpf", "12hpf", "14hpf", "16hpf", "19hpf", "24hpf")
+
+cells_time1b$timepoint <- factor(cells_time1b$timepoint, levels = tp_levels)
+
+celltype_order <- cells_time1b %>%
+  group_by(zebrafish_anatomy_ontology_class) %>%
+  summarise(total = sum(n_cells)) %>%
+  arrange(desc(total)) %>%
+  pull(zebrafish_anatomy_ontology_class)
+
+cells_time1b$zebrafish_anatomy_ontology_class <- factor(
+  cells_time1b$zebrafish_anatomy_ontology_class, levels = celltype_order)
+
+# --- get all cell type levels (ordered by total abundance) ---
+celltype_levels <- cells_time1b %>%
+  group_by(zebrafish_anatomy_ontology_class) %>%
+  summarise(total = sum(n_cells)) %>%
+  arrange(desc(total)) %>%
+  pull(zebrafish_anatomy_ontology_class)
+
+cells_time1$zebrafish_anatomy_ontology_class <- factor(
+  cells_time1$zebrafish_anatomy_ontology_class, levels = celltype_levels)
+
+# --- build a qualitative, maximally distinct color palette ---
+n_types <- length(celltype_levels)
+
+celltype_colors <- met.brewer(rev("Isfahan1"), n = n_types)
+
+names(celltype_colors) <- celltype_levels
+
+# override PGC color explicitly, after palette generation
+celltype_colors["primordial_germ_cells"] <- "darkred"
+
+# --- theme ---
+thesis_theme_legend <- theme_bw(base_size = 6) +
+  theme(
+    axis.text.x  = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y  = element_text(size = 7, face = "bold"),
+    strip.text   = element_text(size = 6, face = "bold"),
+    legend.position = "right",
+    legend.title = element_text(size = 6, face = "bold"),
+    legend.text  = element_text(size = 6),
+    legend.key.size = unit(0.2, "cm"),
+    plot.title = element_text(size = 6),
+    panel.grid.minor = element_blank()
+  )
+
+
+facet_totals <- cells_time1b %>%
+  group_by(timepoint) %>%
+  summarise(
+    total_below100 = dplyr::n_distinct(zebrafish_anatomy_ontology_class[n_cells < 100]),
+    .groups = "drop"
+  )
+
+ct_t_n <- ggplot(cells_time1b,
+                  aes(x = zebrafish_anatomy_ontology_class,
+                      y = n_cells,
+                      fill = zebrafish_anatomy_ontology_class)) +
+  geom_col(alpha = 0.9, width = 0.75) +
+  geom_text(aes(label = ifelse(n_cells < 100, n_cells, "")),
+            vjust = -0.4, size = 1.7, col = "black", fontface = "bold") +
+  geom_text(
+  data = facet_totals,
+  aes(
+    x = Inf,
+    y = Inf,
+    label = paste0("total <100: ", total_below100)
+  ),
+  inherit.aes = FALSE,
+  hjust = 1.2,
+  vjust = 2,
+  fontface = "bold",
+  size = 2
+  ) +
+  facet_wrap(~ timepoint, ncol = 2) +
+  scale_fill_manual(values = celltype_colors, name = "cell types",
+                     guide = guide_legend(ncol = 1)) +   # force single vertical column
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
+  thesis_theme_legend +
+  labs(title = "Number of cells per cell type before filtering",
+       y = "number of cells",
+       x = "cell types") +
+  theme(
+  axis.title.x = element_text(face = "bold", margin = margin(t = 8))
+  ) +
+  theme(axis.title.y = element_text(face = "bold"))
+
+ct_t_n
+
+ggsave(
+  filename = "ct_t_n_celltypes_before_filtering.pdf",
+  plot = ct_t_n,
+  width = 20,      # cm
+  height = 12,     # cm — tall, to give each of the 7 stacked facets enough room
+  units = "cm",
+  dpi = 300,
+  device = "pdf"    # vector format — best for thesis print, scales without pixelation
+)
+
+# also save a PNG version for quick previews / slides / drafts
+ggsave(
+  filename = "ct_t_n_celltypes_before_filtering.png",
+  plot = ct_t_n,
+  width = 20,
+  height = 12,
+  units = "cm",
+  dpi = 300,
+  device = "png"
+)
+  
+```
 
